@@ -5,6 +5,7 @@ Compiling into bytecode:
   ocamlbuild -use-ocamlfind -pkgs core -tag thread computePairwiseDistances.byte
 Compiling into native code:
   ocamlbuild -use-ocamlfind -pkgs core -tag thread computePairwiseDistances.native
+
 *)
 
 
@@ -82,34 +83,26 @@ let filter_map_item it =
   | Some (left, _) ->
     Some { it with description = left }
 
-
 let seq_diffs x y =
-  if String.length x.sequence <> String.length y.sequence
-  then failwithf "Error: sequences %s and %s do not have the same length." x.description y.description () ;
-  String.foldi x.sequence ~init:0 ~f:(fun i accu xc ->
-      let yc = y.sequence.[i] in
-      if xc <> yc && xc <> 'N' && yc <> 'N' then accu + 1 else accu
-    )
-
-(*
-let seq_diffs xs ys =
-  let n = String.length xs in
+  (* if String.length x <> String.length y *)
+  (* then failwithf "Error: sequences do not have the same length." () ; *)
+  let n = String.length x in
   let sum = ref 0 in
-  for k = 0 to n - 1 do
-    let xc = xs.[k]
-    and yc = ys.[k] in
-    if xc <> yc && xc <> 'N' && yc <> 'N' then incr sum
+  for i = 0 to n - 1 do
+    let xc = x.[i] in
+    let yc = y.[i] in
+    if xc <> yc && xc <> 'N' && yc <> 'N' then (
+      sum := !sum + 1
+    )
   done ;
   !sum
-*)
 
 let output_diffs oc al =
   fprintf oc "from\tto\tdist\n" ;
   let n = Array.length al in
   for i = 0 to n - 2 do
     for j = i + 1 to n - 1 do
-      (*let d = seq_diffs al.(i).sequence al.(j).sequence in*)
-      let d = seq_diffs al.(i) al.(j) in
+      let d = seq_diffs al.(i).sequence al.(j).sequence in
       fprintf oc "%s\t%s\t%d\n" al.(i).description al.(j).description d
     done
   done
